@@ -667,13 +667,11 @@ bool LatencyTestPublisher::test(
             logError(LatencyTest, "Publisher write operation failed");
             return false;
         }
-        // logDebug(LatencyTest_Publisher, "Published data with seq num " << latency_data_out_->seqnum);
-
 
         std::unique_lock<std::mutex> lock(mutex_);
         // the wait timeouts due possible message leaks
         data_msg_cv_.wait_for(lock,
-                std::chrono::milliseconds(300),
+                std::chrono::milliseconds(1000),
                 [&]()
                 {
                     return data_msg_count_ >= subscribers_;

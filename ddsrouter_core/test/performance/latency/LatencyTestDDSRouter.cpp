@@ -63,7 +63,52 @@ bool LatencyTestDDSRouter::init()
 {
     initialized_ = true;
 
+    /* Create Command DataReader*/
+    DomainParticipantQos pqos;
+
+    // Default participant name
+    pqos.name("latency_test_ddsrouter");
+
+    // Create the participant
+    participant_ = DomainParticipantFactory::get_instance()->create_participant(
+            std::get<0>(domains_).domain_id(), pqos);
+    if (participant_ == nullptr)
+    {
+        return false;
+    }
+
+    // Register the command type
+    if (ReturnCode_t::RETCODE_OK != latency_command_type_.register_type(participant_))
+    {
+        logError(LatencyTest_DDSRouter, "ERROR registering the COMMAND type");
+        return false;
+    }
+
+    // Create Subscriber
+    subscriber_ = participant_->create_subscriber(SUBSCRIBER_QOS_DEFAULT, nullptr);
+    if (subscriber_ == nullptr)
+    {
+        logError(LatencyTest_DDSRouter, "ERROR creating SUBSCRIBER");
+        return false;
+    }
+
     create_topics_();
+
+    // Create command DataReader
+    DataReaderQos cr_qos;
+    cr_qos.history().kind = HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
+    cr_qos.reliability().kind = ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
+    cr_qos.durability().kind = DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
+
+    command_reader_ = subscriber_->create_datareader(
+        latency_command_sub_topic_,
+        cr_qos,
+        &command_reader_listener_);
+
+    if (command_reader_ == nullptr)
+    {
+        initialized_ = false;
+    }
 
     if (std::get<0>(domains_) == std::get<1>(domains_))
     {
@@ -115,43 +160,6 @@ bool LatencyTestDDSRouter::init()
         participants_configurations);
 
     ddsrouter_ = std::make_unique<DDSRouter>(ddsrouter_configuration);
-
-    /* Create Command DataReader*/
-    DomainParticipantQos pqos;
-
-    // Default participant name
-    pqos.name("latency_test_ddsrouter");
-
-    // Create the participant
-    participant_ = DomainParticipantFactory::get_instance()->create_participant(
-            std::get<0>(domains_).domain_id(), pqos);
-    if (participant_ == nullptr)
-    {
-        return false;
-    }
-
-    // Register the command type
-    if (ReturnCode_t::RETCODE_OK != latency_command_type_.register_type(participant_))
-    {
-        logError(LatencyTest_Subscriber, "ERROR registering the COMMAND type");
-        return false;
-    }
-
-    // Create Command Reader
-    DataReaderQos cr_qos;
-    cr_qos.history().kind = HistoryQosPolicyKind::KEEP_ALL_HISTORY_QOS;
-    cr_qos.reliability().kind = ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
-    cr_qos.durability().kind = DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
-
-    command_reader_ = subscriber_->create_datareader(
-        latency_command_sub_topic_,
-        cr_qos,
-        &command_reader_listener_);
-
-    if (command_reader_ == nullptr)
-    {
-        return false;
-    }
 
     return initialized_;
 }
