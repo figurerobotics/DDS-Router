@@ -38,6 +38,8 @@ RealTopic::RealTopic(
         bool topic_reliable /* = false */) noexcept
     : Topic(topic_name, topic_type, topic_with_key)
     , topic_reliable_(topic_reliable)
+    , qos_attached_(false)
+    , qos_(QoS())
 {
 }
 
@@ -47,11 +49,15 @@ RealTopic::RealTopic(
         const std::string& topic_type) noexcept
     : Topic(topic_name, topic_type)
     , topic_reliable_(topic_reliable)
+    , qos_attached_(false)
+    , qos_(QoS())
 {
 }
 
 RealTopic::RealTopic()
     : Topic(INVALID_TOPIC_NAME, INVALID_TOPIC_TYPE)
+    , qos_attached_(false)
+    , qos_(QoS())
 {
 }
 
@@ -93,6 +99,23 @@ bool RealTopic::is_valid() const noexcept
 bool RealTopic::topic_reliable() const
 {
     return topic_reliable_;
+}
+
+bool RealTopic::qos_attached() const
+{
+    return qos_attached_;
+}
+
+QoS RealTopic::qos() const
+{
+    return qos_;
+}
+
+void RealTopic::attach_qos(
+        QoS qos)
+{
+    qos_ = qos;
+    qos_attached_ = true;
 }
 
 std::ostream& operator <<(

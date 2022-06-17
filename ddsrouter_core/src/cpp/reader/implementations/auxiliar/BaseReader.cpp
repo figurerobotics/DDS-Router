@@ -147,7 +147,14 @@ std::ostream& operator <<(
         std::ostream& os,
         const BaseReader& reader)
 {
-    os << "Reader{" << reader.participant_id_ << ";" << reader.topic_ << "}";
+    if (reader.topic_.qos_attached())
+    {
+        os << "Reader{" << reader.participant_id_ << ";" << reader.topic_ << ";" << reader.topic_.qos() << "}";
+    }
+    else
+    {
+        os << "Reader{" << reader.participant_id_ << ";" << reader.topic_ << "}";
+    }
     return os;
 }
 
