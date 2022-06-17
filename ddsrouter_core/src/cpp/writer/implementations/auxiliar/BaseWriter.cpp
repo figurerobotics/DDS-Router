@@ -97,7 +97,14 @@ std::ostream& operator <<(
         std::ostream& os,
         const BaseWriter& writer)
 {
-    os << "Writer{" << writer.participant_id_ << ";" << writer.topic_ << "}";
+    if (writer.topic_.qos_attached())
+    {
+        os << "Writer{" << writer.participant_id_ << ";" << writer.topic_ << ";" << writer.topic_.qos() << "}";
+    }
+    else
+    {
+        os << "Writer{" << writer.participant_id_ << ";" << writer.topic_ << "}";
+    }
     return os;
 }
 

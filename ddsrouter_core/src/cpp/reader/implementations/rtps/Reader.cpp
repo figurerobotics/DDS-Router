@@ -195,7 +195,12 @@ fastrtps::rtps::ReaderAttributes Reader::reader_attributes_() const noexcept
 {
     fastrtps::rtps::ReaderAttributes att;
 
-    if (topic_.topic_reliable())
+    if (topic_.qos_attached())
+    {
+        att.endpoint.reliabilityKind = topic_.qos().reliability();
+        att.endpoint.durabilityKind =  topic_.qos().durability();
+    }
+    else if (topic_.topic_reliable())
     {
         att.endpoint.reliabilityKind = fastrtps::rtps::ReliabilityKind_t::RELIABLE;
         att.endpoint.durabilityKind = fastrtps::rtps::DurabilityKind_t::TRANSIENT_LOCAL;
@@ -237,7 +242,29 @@ fastrtps::ReaderQos Reader::reader_qos_() const noexcept
 {
     fastrtps::ReaderQos qos;
 
-    if (topic_.topic_reliable())
+    if (topic_.qos_attached())
+    {
+        types::QoS topic_qos = topic_.qos();
+
+        if (topic_qos.reliability() == fastrtps::rtps::ReliabilityKind_t::RELIABLE)
+        {
+            qos.m_reliability.kind = fastdds::dds::ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
+        }
+        else
+        {
+            qos.m_reliability.kind = fastdds::dds::ReliabilityQosPolicyKind::BEST_EFFORT_RELIABILITY_QOS;
+        }
+
+        if (topic_qos.durability() == fastrtps::rtps::DurabilityKind_t::TRANSIENT_LOCAL)
+        {
+            qos.m_durability.kind = fastdds::dds::DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
+        }
+        else
+        {
+            qos.m_durability.kind = fastdds::dds::DurabilityQosPolicyKind::VOLATILE_DURABILITY_QOS;
+        }
+    }
+    else if (topic_.topic_reliable())
     {
         qos.m_reliability.kind = fastdds::dds::ReliabilityQosPolicyKind::RELIABLE_RELIABILITY_QOS;
         qos.m_durability.kind = fastdds::dds::DurabilityQosPolicyKind::TRANSIENT_LOCAL_DURABILITY_QOS;
@@ -269,7 +296,9 @@ void Reader::onNewCacheChangeAdded(
         else
         {
             // Remove received change if the Reader is disbled and the topic is not reliable
-            if (!topic_.topic_reliable())
+            if (!topic_.topic_reliable() ||
+                    (topic_.qos_attached() &&
+                    topic_.qos().reliability() != fastrtps::rtps::ReliabilityKind_t::RELIABLE))
             {
                 rtps_reader_->getHistory()->remove_change((fastrtps::rtps::CacheChange_t*)change);
             }

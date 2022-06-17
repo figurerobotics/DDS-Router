@@ -20,6 +20,7 @@
 #define _DDSROUTERCORE_TYPES_TOPIC_REALTOPIC_HPP_
 
 #include <ddsrouter_core/library/library_dll.h>
+#include <ddsrouter_core/types/endpoint/QoS.hpp>
 #include <ddsrouter_core/types/topic/Topic.hpp>
 
 namespace eprosima {
@@ -65,6 +66,13 @@ struct RealTopic : public Topic
     //! Topic reliability getter
     DDSROUTER_CORE_DllAPI bool topic_reliable() const;
 
+    DDSROUTER_CORE_DllAPI bool qos_attached() const;
+
+    DDSROUTER_CORE_DllAPI QoS qos() const;
+
+    DDSROUTER_CORE_DllAPI void attach_qos(
+            QoS qos);
+
 protected:
 
     static const char* INVALID_TOPIC_NAME;  // __invalid_topic_name__
@@ -72,6 +80,10 @@ protected:
 
     //! The DataReader subscribed to this topic is configured as RELIABLE
     bool topic_reliable_;
+
+    bool qos_attached_;
+
+    QoS qos_;
 };
 
 /**
