@@ -358,7 +358,10 @@ void DDSRouterImpl::discovered_endpoint_(
 {
     logDebug(DDSROUTER, "Endpoint discovered in DDS Router core: " << endpoint << ".");
 
-    discovered_topic_(endpoint.topic());
+    RealTopic topic = endpoint.topic();
+    topic.attach_qos(endpoint.qos());
+
+    discovered_topic_(topic);
 }
 
 void DDSRouterImpl::create_new_bridge(

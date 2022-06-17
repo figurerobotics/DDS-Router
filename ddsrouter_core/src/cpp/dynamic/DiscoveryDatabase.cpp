@@ -132,9 +132,12 @@ bool DiscoveryDatabase::add_endpoint_(
 
         logInfo(DDSROUTER_DISCOVERY_DATABASE, "Inserting a new discovered Endpoint " << new_endpoint << ".");
 
-        for (auto added_endpoint_callback : added_endpoint_callbacks_)
+        if (new_endpoint.kind() == types::EndpointKind::READER)
         {
-            added_endpoint_callback(new_endpoint);
+            for (auto added_endpoint_callback : added_endpoint_callbacks_)
+            {
+                added_endpoint_callback(new_endpoint);
+            }
         }
 
         return true;
