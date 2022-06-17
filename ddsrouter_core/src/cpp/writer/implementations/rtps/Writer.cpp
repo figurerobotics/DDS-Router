@@ -139,13 +139,13 @@ utils::ReturnCode Writer::write_(
     // Send data by adding it to Writer History
     rtps_history_->add_change(new_change);
 
-    if (!topic_.topic_reliable() ||
-            (topic_.qos_attached() &&
-            topic_.qos().reliability() != fastrtps::rtps::ReliabilityKind_t::RELIABLE))
-    {
-        // Change has been sent, remove it if best_effort (TODO: does this really work?)
-        rtps_history_->remove_change(new_change);
-    }
+    // if (!topic_.topic_reliable() ||
+    //         (topic_.qos_attached() &&
+    //         topic_.qos().reliability() != fastrtps::rtps::ReliabilityKind_t::RELIABLE))
+    // {
+    //     // Change has been sent, remove it if best_effort (TODO: does this really work?)
+    //     rtps_history_->remove_change(new_change);
+    // }
 
     return utils::ReturnCode::RETCODE_OK;
 }
@@ -173,7 +173,7 @@ fastrtps::rtps::WriterAttributes Writer::writer_attributes_() const noexcept
         att.endpoint.reliabilityKind = eprosima::fastrtps::rtps::ReliabilityKind_t::RELIABLE;
     }
 
-    att.mode = fastrtps::rtps::RTPSWriterPublishMode::SYNCHRONOUS_WRITER;
+    att.mode = fastrtps::rtps::RTPSWriterPublishMode::ASYNCHRONOUS_WRITER;
 
     if (topic_.topic_with_key())
     {
