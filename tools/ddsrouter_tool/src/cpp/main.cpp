@@ -89,7 +89,7 @@ int main(
     if (activate_debug)
     {
         // Activate log
-        utils::Log::SetVerbosity(utils::Log::Kind::Warning);
+        utils::Log::SetVerbosity(utils::Log::Kind::Info);
 
         // NOTE:
         // It will not filter any log, so Fast DDS logs will be visible unless Fast DDS is compiled
