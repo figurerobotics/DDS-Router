@@ -97,6 +97,12 @@ Reader::~Reader()
             participant_id_ << " for topic " << topic_);
 }
 
+types::Guid Reader::guid() const noexcept
+{
+    // never nullptr (exception thrown in construction)
+    return rtps_reader_->getGuid();
+}
+
 utils::ReturnCode Reader::take_(
         std::unique_ptr<DataReceived>& data) noexcept
 {
@@ -142,9 +148,21 @@ utils::ReturnCode Reader::take_(
         return utils::ReturnCode::RETCODE_ERROR;
     }
 
+    std::cout << "Received change in topic: " << topic_ << std::endl;
+    std::cout << "sample_identity: " << received_change->write_params.sample_identity() << std::endl;
+    std::cout << "related_sample_identity: " << received_change->write_params.related_sample_identity() << std::endl;
+    std::cout << "writer GUID: " << received_change->writerGUID << std::endl;
+    std::cout << "sequence number: " << received_change->sequenceNumber << std::endl << std::endl;
+
     // Store the new data that has arrived in the Track data
     // Get the writer guid
     data->source_guid = received_change->writerGUID;
+
+    data->sequenceNumber = received_change->sequenceNumber;
+
+    data->write_params = received_change->write_params;
+
+    data->receiver_participant_id = participant_id_;
 
     // Store it in DDSRouter PayloadPool
     eprosima::fastrtps::rtps::IPayloadPool* payload_owner = received_change->payload_owner();

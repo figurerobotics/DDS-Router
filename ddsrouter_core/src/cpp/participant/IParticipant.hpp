@@ -19,6 +19,7 @@
 #ifndef __SRC_DDSROUTERCORE_PARTICIPANT_IDDS_ROUTERPARTICIPANT_HPP_
 #define __SRC_DDSROUTERCORE_PARTICIPANT_IDDS_ROUTERPARTICIPANT_HPP_
 
+#include <ddsrouter_core/types/dds/ServiceRegistry.hpp>
 #include <ddsrouter_core/types/endpoint/Endpoint.hpp>
 #include <ddsrouter_core/types/participant/ParticipantId.hpp>
 #include <ddsrouter_core/types/participant/ParticipantKind.hpp>
@@ -63,6 +64,8 @@ public:
      */
     virtual types::ParticipantKind kind() const noexcept = 0;
 
+    virtual bool is_rtps_kind() const noexcept = 0;
+
     /**
      * @brief Return a new Writer
      *
@@ -77,6 +80,14 @@ public:
      */
     virtual std::shared_ptr<IWriter> create_writer(
             types::RealTopic topic) = 0;
+
+    virtual std::shared_ptr<IWriter> create_request_writer(
+            types::RealTopic request_topic,
+            std::shared_ptr<types::ServiceRegistry> service_registry=nullptr) = 0;
+
+    virtual std::shared_ptr<IWriter> create_reply_writer(
+            types::RealTopic reply_topic,
+            std::shared_ptr<types::ServiceRegistry> service_registry=nullptr) = 0;
 
     /**
      * @brief Return a new Reader

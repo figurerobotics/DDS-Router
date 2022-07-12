@@ -34,12 +34,14 @@ Endpoint::Endpoint(
         const EndpointKind& kind,
         const Guid& guid,
         const QoS& qos,
-        const RealTopic& topic) noexcept
+        const RealTopic& topic,
+        const ParticipantId& discoverer_participant_id) noexcept
     : kind_(kind)
     , guid_(guid)
     , qos_(qos)
     , topic_(topic)
     , active_(true)
+    , discoverer_participant_id_(discoverer_participant_id)
 {
 }
 
@@ -61,6 +63,11 @@ QoS Endpoint::qos() const noexcept
 RealTopic Endpoint::topic() const noexcept
 {
     return topic_;
+}
+
+ParticipantId Endpoint::discoverer_participant_id() const noexcept
+{
+    return discoverer_participant_id_;
 }
 
 bool Endpoint::active() const noexcept
@@ -97,6 +104,7 @@ Endpoint& Endpoint::operator =(
     this->kind_ = other.kind_;
     this->qos_ = other.qos_;
     this->topic_ = other.topic_;
+    this->discoverer_participant_id_ = other.discoverer_participant_id_;
     return *this;
 }
 
@@ -104,6 +112,7 @@ bool Endpoint::operator ==(
         const Endpoint& other) const noexcept
 {
     return guid_ == other.guid() && kind_ == other.kind() && qos_ == other.qos() && topic_ == other.topic();
+    // TODO: compare discoverer_participant_id_?
 }
 
 std::ostream& operator <<(
@@ -140,7 +149,7 @@ std::ostream& operator <<(
     std::string active_str = endpoint.active_ ? "Active" : "Inactive";
 
     os << "Endpoint{" << endpoint.guid_ << ";" << endpoint.topic_ << ";" << endpoint.qos_ << ";" <<
-        endpoint.kind_ << ";" << active_str << "}";
+        endpoint.kind_ << ";" << active_str << ";" << endpoint.discoverer_participant_id_ << "}"; // print this as well?
     return os;
 }
 

@@ -57,6 +57,20 @@ std::shared_ptr<IWriter> DummyParticipant::create_writer_(
     return std::make_shared<DummyWriter>(id(), topic, payload_pool_);
 }
 
+std::shared_ptr<IWriter> DummyParticipant::create_request_writer_(
+        RealTopic request_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer_(request_topic);
+}
+
+std::shared_ptr<IWriter> DummyParticipant::create_reply_writer_(
+        RealTopic reply_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer_(reply_topic);
+}
+
 std::shared_ptr<IReader> DummyParticipant::create_reader_(
         RealTopic topic)
 {

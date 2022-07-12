@@ -30,6 +30,7 @@
 
 #include <reader/implementations/auxiliar/BaseReader.hpp>
 
+#include <ddsrouter_core/types/dds/Guid.hpp>
 #include <ddsrouter_core/types/participant/ParticipantId.hpp>
 
 namespace eprosima {
@@ -98,6 +99,8 @@ public:
     void onReaderMatched(
             fastrtps::rtps::RTPSReader*,
             fastrtps::rtps::MatchingInfo& info) noexcept override;
+
+    types::Guid guid() const noexcept;
 
 protected:
 

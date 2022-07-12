@@ -1,4 +1,4 @@
-// Copyright 2021 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2022 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <communication/Track.hpp>
 #include <participant/IParticipant.hpp>
 #include <core/ParticipantsDatabase.hpp>
+#include <ddsrouter_core/types/dds/ServiceRegistry.hpp>
 #include <ddsrouter_core/types/participant/ParticipantId.hpp>
 #include <ddsrouter_thread/pool/SlotThreadPool.hpp>
 
@@ -60,7 +61,8 @@ public:
             std::shared_ptr<ParticipantsDatabase> participants_database,
             std::shared_ptr<PayloadPool> payload_pool,
             std::shared_ptr<thread::SlotThreadPool> thread_pool,
-            bool enable = false);
+            bool enable = false,
+            std::shared_ptr<types::ServiceRegistry> service_registry=nullptr);
 
     /**
      * @brief Destructor
@@ -69,6 +71,8 @@ public:
      * It deletes all the tracks created and all Writers and Readers.
      */
     virtual ~Bridge();
+
+    // virtual void init_();
 
     /**
      * Copy method not allowed
