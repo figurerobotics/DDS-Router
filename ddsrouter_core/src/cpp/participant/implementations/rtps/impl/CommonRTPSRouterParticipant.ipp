@@ -31,6 +31,8 @@
 
 #include <reader/implementations/rtps/Reader.hpp>
 #include <writer/implementations/rtps/Writer.hpp>
+#include <writer/implementations/rtps/RequestWriter.hpp>
+#include <writer/implementations/rtps/ReplyWriter.hpp>
 #include <participant/implementations/auxiliar/BaseParticipant.hpp>
 
 namespace eprosima {
@@ -119,11 +121,11 @@ types::Endpoint CommonRTPSRouterParticipant<ConfigurationType>::create_endpoint_
     // Create Endpoint
     if (std::is_same<DiscoveryInfoKind, fastrtps::rtps::ReaderDiscoveryInfo>::value)
     {
-        return types::Endpoint(types::EndpointKind::reader, info_guid, info_qos, info_topic);
+        return types::Endpoint(types::EndpointKind::reader, info_guid, info_qos, info_topic, this->id_nts_());
     }
     else if (std::is_same<DiscoveryInfoKind, fastrtps::rtps::WriterDiscoveryInfo>::value)
     {
-        return types::Endpoint(types::EndpointKind::writer, info_guid, info_qos, info_topic);
+        return types::Endpoint(types::EndpointKind::writer, info_guid, info_qos, info_topic, this->id_nts_());
     }
     else
     {
@@ -244,6 +246,26 @@ std::shared_ptr<IWriter> CommonRTPSRouterParticipant<ConfigurationType>::create_
     return std::make_shared<Writer>(
         this->id(), topic,
         this->payload_pool_, rtps_participant_);
+}
+
+template <class ConfigurationType>
+std::shared_ptr<IWriter> CommonRTPSRouterParticipant<ConfigurationType>::create_request_writer_(
+        types::RealTopic request_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return std::make_shared<RequestWriter>(
+        this->id_nts_(), request_topic,
+        this->payload_pool_, rtps_participant_, service_registry);
+}
+
+template <class ConfigurationType>
+std::shared_ptr<IWriter> CommonRTPSRouterParticipant<ConfigurationType>::create_reply_writer_(
+        types::RealTopic reply_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return std::make_shared<ReplyWriter>(
+        this->id_nts_(), reply_topic,
+        this->payload_pool_, rtps_participant_, service_registry);
 }
 
 template <class ConfigurationType>

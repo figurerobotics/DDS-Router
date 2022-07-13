@@ -47,9 +47,19 @@ public:
     //! Override kind() IParticipant method
     types::ParticipantKind kind() const noexcept override;
 
+    bool is_rtps_kind() const noexcept override;
+
     //! Override create_writer() IParticipant method
     std::shared_ptr<IWriter> create_writer(
             types::RealTopic topic) override;
+
+    std::shared_ptr<IWriter> create_request_writer(
+            types::RealTopic request_topic,
+            std::shared_ptr<types::ServiceRegistry>) override;
+
+    std::shared_ptr<IWriter> create_reply_writer(
+            types::RealTopic reply_topic,
+            std::shared_ptr<types::ServiceRegistry>) override;
 
     //! Override create_reader() IParticipant method
     std::shared_ptr<IReader> create_reader(

@@ -130,6 +130,14 @@ protected:
     std::shared_ptr<IWriter> create_writer_(
             types::RealTopic topic) override;
 
+    std::shared_ptr<IWriter> create_request_writer_(
+            types::RealTopic request_topic,
+            std::shared_ptr<types::ServiceRegistry> service_registry) override;
+
+    std::shared_ptr<IWriter> create_reply_writer_(
+            types::RealTopic reply_topic,
+            std::shared_ptr<types::ServiceRegistry> service_registry) override;
+
     //! Override create_reader_() BaseParticipant method
     std::shared_ptr<IReader> create_reader_(
             types::RealTopic topic) override;

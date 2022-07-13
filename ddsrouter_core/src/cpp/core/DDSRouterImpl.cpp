@@ -26,6 +26,7 @@
 #include <ddsrouter_utils/Log.hpp>
 
 #include <ddsrouter_core/configuration/DDSRouterConfiguration.hpp>
+#include <ddsrouter_core/types/dds/ServiceRegistry.hpp>
 
 #include <core/DDSRouterImpl.hpp>
 #include <efficiency/FastPayloadPool.hpp>
@@ -365,8 +366,19 @@ void DDSRouterImpl::discovered_endpoint_(
 
     RealTopic topic = endpoint.topic();
     topic.attach_qos(endpoint.qos());
-
-    discovered_topic_(topic);
+    if (ServiceRegistry::is_service_topic(topic))
+    {
+        if ((endpoint.is_reader() && ServiceRegistry::is_request_topic(topic)) ||
+                (endpoint.is_writer() && ServiceRegistry::is_reply_topic(topic)))
+        {
+            // Service server discovered, create service
+            create_new_service(topic, endpoint.discoverer_participant_id());
+        }
+    }
+    else
+    {
+        discovered_topic_(topic);
+    }
 }
 
 void DDSRouterImpl::create_new_bridge(
@@ -387,6 +399,48 @@ void DDSRouterImpl::create_new_bridge(
                 "Error creating Bridge for topic " << topic <<
                 ". Error code:" << e.what() << ".");
     }
+}
+
+void DDSRouterImpl::create_new_service(
+        const types::RealTopic& topic,
+        const types::ParticipantId& server_participant_id) noexcept
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+
+    std::shared_ptr<ServiceRegistry> service_registry = std::make_shared<ServiceRegistry>(topic, server_participant_id);
+    types::RealTopic request_topic = service_registry->request_topic();
+    types::RealTopic reply_topic = service_registry->reply_topic();
+
+    logInfo(DDSROUTER, "Creating Service: " << service_registry->service_name() << ".");
+
+    try
+    {
+        bridges_[reply_topic] = std::make_unique<Bridge>(reply_topic, participants_database_, payload_pool_,
+                        thread_pool_, false, service_registry);
+    }
+    catch (const utils::InitializationException& e)
+    {
+        logError(DDSROUTER,
+                "Error creating Bridge for topic " << reply_topic <<
+                ". Error code:" << e.what() << ".");
+    }
+
+    // TODO: wait for reader of only track to be matched to reduce probability of broken service (could also wait after both bridges are created, before enabling them)
+
+    try
+    {
+        bridges_[request_topic] = std::make_unique<Bridge>(request_topic, participants_database_, payload_pool_,
+                        thread_pool_, false, service_registry);
+    }
+    catch (const utils::InitializationException& e)
+    {
+        logError(DDSROUTER,
+                "Error creating Bridge for topic " << request_topic <<
+                ". Error code:" << e.what() << ".");
+    }
+
+    activate_topic_(reply_topic);
+    activate_topic_(request_topic);
 }
 
 void DDSRouterImpl::activate_topic_(

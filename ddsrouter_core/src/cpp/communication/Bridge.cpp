@@ -18,8 +18,10 @@
  */
 
 #include <communication/Bridge.hpp>
+
 #include <ddsrouter_utils/exception/UnsupportedException.hpp>
 #include <ddsrouter_utils/Log.hpp>
+#include <participant/implementations/rtps/CommonRTPSRouterParticipant.hpp>
 
 namespace eprosima {
 namespace ddsrouter {
@@ -32,7 +34,8 @@ Bridge::Bridge(
         std::shared_ptr<ParticipantsDatabase> participants_database,
         std::shared_ptr<PayloadPool> payload_pool,
         std::shared_ptr<utils::SlotThreadPool> thread_pool,
-        bool enable /* = false */)
+        bool enable /* = false */,
+        std::shared_ptr<ServiceRegistry> service_registry /* = nullptr */)
     : topic_(topic)
     , participants_(participants_database)
     , payload_pool_(payload_pool)
@@ -46,8 +49,33 @@ Bridge::Bridge(
     for (ParticipantId id: ids)
     {
         std::shared_ptr<IParticipant> participant = participants_->get_participant(id);
-        writers_[id] = participant->create_writer(topic);
-        readers_[id] = participant->create_reader(topic);
+        if (nullptr != service_registry && participant->is_rtps_kind())
+        {
+            if (topic == service_registry->request_topic())
+            {
+                writers_[id] = participant->create_request_writer(topic, service_registry);
+            }
+            else if (topic == service_registry->reply_topic())
+            {
+                writers_[id] = participant->create_reply_writer(topic, service_registry);
+            }
+            else
+            {
+                logError(DDSROUTER_BRIDGE, "Error occurred while creating service Bridge for topic" << topic);
+            }
+
+            readers_[id] = participant->create_reader(topic);
+            if (id == service_registry->server_participant_id() && topic == service_registry->reply_topic())
+            {
+                service_registry->set_related_sample_identity(std::static_pointer_cast<rtps::Reader>(
+                            readers_[id])->guid());
+            }
+        }
+        else
+        {
+            writers_[id] = participant->create_writer(topic);
+            readers_[id] = participant->create_reader(topic);
+        }
     }
 
     // Generate tracks

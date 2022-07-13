@@ -43,10 +43,29 @@ ParticipantKind BlankParticipant::kind() const noexcept
     return ParticipantKind::blank;
 }
 
+bool BlankParticipant::is_rtps_kind() const noexcept
+{
+    return false;
+}
+
 std::shared_ptr<IWriter> BlankParticipant::create_writer(
         RealTopic topic)
 {
     return std::make_shared<BlankWriter>();
+}
+
+std::shared_ptr<IWriter> BlankParticipant::create_request_writer(
+        types::RealTopic request_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer(request_topic);
+}
+
+std::shared_ptr<IWriter> BlankParticipant::create_reply_writer(
+        types::RealTopic reply_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer(reply_topic);
 }
 
 std::shared_ptr<IReader> BlankParticipant::create_reader(

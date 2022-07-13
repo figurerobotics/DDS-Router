@@ -74,9 +74,27 @@ types::ParticipantId BaseParticipant<ConfigurationType>::id() const noexcept
 template <class ConfigurationType>
 types::ParticipantKind BaseParticipant<ConfigurationType>::kind() const noexcept
 {
+    // TODO: check if necessary
     std::lock_guard <std::recursive_mutex> lock(mutex_);
 
     return configuration_.kind();
+}
+
+template <class ConfigurationType>
+bool BaseParticipant<ConfigurationType>::is_rtps_kind() const noexcept
+{
+    // TODO: check if necessary
+    // std::lock_guard <std::recursive_mutex> lock(mutex_);
+
+    switch (configuration_.kind()())
+    {
+        case types::ParticipantKind::SIMPLE_RTPS:
+        case types::ParticipantKind::LOCAL_DISCOVERY_SERVER:
+        case types::ParticipantKind::WAN:
+            return true;
+        default:
+            return false;
+    }
 }
 
 template <class ConfigurationType>
@@ -99,6 +117,56 @@ std::shared_ptr<IWriter> BaseParticipant<ConfigurationType>::create_writer(
 
     // Insertion must not fail as we already know it does not exist
     writers_.emplace(topic, new_writer);
+
+    return new_writer;
+}
+
+template <class ConfigurationType>
+std::shared_ptr<IWriter> BaseParticipant<ConfigurationType>::create_request_writer(
+        types::RealTopic request_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    std::lock_guard <std::recursive_mutex> lock(mutex_);
+
+    if (writers_.find(request_topic) != writers_.end())
+    {
+        throw utils::InitializationException(
+                  utils::Formatter() <<
+                      "Error creating request writer for topic " << request_topic << " in participant " << id() <<
+                      ". Writer already exists.");
+    }
+
+    std::shared_ptr <IWriter> new_writer = create_request_writer_(request_topic, service_registry);
+
+    logInfo(DDSROUTER_BASEPARTICIPANT, "Created request writer in Participant " << id() << " for topic " << request_topic);
+
+    // Insertion must not fail as we already know it does not exist
+    writers_.emplace(request_topic, new_writer);
+
+    return new_writer;
+}
+
+template <class ConfigurationType>
+std::shared_ptr<IWriter> BaseParticipant<ConfigurationType>::create_reply_writer(
+        types::RealTopic reply_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    std::lock_guard <std::recursive_mutex> lock(mutex_);
+
+    if (writers_.find(reply_topic) != writers_.end())
+    {
+        throw utils::InitializationException(
+                  utils::Formatter() <<
+                      "Error creating reply writer for topic " << reply_topic << " in participant " << id() <<
+                      ". Writer already exists.");
+    }
+
+    std::shared_ptr <IWriter> new_writer = create_reply_writer_(reply_topic, service_registry);
+
+    logInfo(DDSROUTER_BASEPARTICIPANT, "Created reply writer in Participant " << id() << " for topic " << reply_topic);
+
+    // Insertion must not fail as we already know it does not exist
+    writers_.emplace(reply_topic, new_writer);
 
     return new_writer;
 }

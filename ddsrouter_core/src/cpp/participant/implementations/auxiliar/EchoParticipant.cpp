@@ -33,6 +33,20 @@ std::shared_ptr<IWriter> EchoParticipant::create_writer_(
     return std::make_shared<EchoWriter>(id(), topic, payload_pool_);
 }
 
+std::shared_ptr<IWriter> EchoParticipant::create_request_writer_(
+        RealTopic request_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer_(request_topic);
+}
+
+std::shared_ptr<IWriter> EchoParticipant::create_reply_writer_(
+        RealTopic reply_topic,
+        std::shared_ptr<types::ServiceRegistry> service_registry)
+{
+    return create_writer_(reply_topic);
+}
+
 std::shared_ptr<IReader> EchoParticipant::create_reader_(
         RealTopic)
 {

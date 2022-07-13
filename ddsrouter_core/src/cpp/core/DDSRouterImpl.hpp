@@ -196,6 +196,10 @@ protected:
             const types::RealTopic& topic,
             bool enabled = false) noexcept;
 
+    void create_new_service(
+            const types::RealTopic& topic,
+            const types::ParticipantId& server_participant_id) noexcept;
+
     /**
      * @brief Enable a specific topic
      *

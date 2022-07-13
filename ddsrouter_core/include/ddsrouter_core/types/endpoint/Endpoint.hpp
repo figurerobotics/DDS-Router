@@ -22,6 +22,7 @@
 #include <ddsrouter_core/library/library_dll.h>
 #include <ddsrouter_core/types/dds/Guid.hpp>
 #include <ddsrouter_core/types/endpoint/QoS.hpp>
+#include <ddsrouter_core/types/participant/ParticipantId.hpp>
 #include <ddsrouter_core/types/topic/RealTopic.hpp>
 
 namespace eprosima {
@@ -70,7 +71,8 @@ public:
             const EndpointKind& kind,
             const Guid& guid,
             const QoS& qos,
-            const RealTopic& topic) noexcept;
+            const RealTopic& topic,
+            const ParticipantId& discoverer_participant_id = ParticipantId()) noexcept;
 
     //! Endpoint kind getter
     DDSROUTER_CORE_DllAPI EndpointKind kind() const noexcept;
@@ -83,6 +85,8 @@ public:
 
     //! Topic getter
     DDSROUTER_CORE_DllAPI RealTopic topic() const noexcept;
+
+    DDSROUTER_CORE_DllAPI ParticipantId discoverer_participant_id() const noexcept;
 
     //! Whether the endpoint referenced is currently active
     DDSROUTER_CORE_DllAPI bool active() const noexcept;
@@ -128,6 +132,8 @@ protected:
 
     //! Whether the endpoint is currently active
     bool active_;
+
+    ParticipantId discoverer_participant_id_;
 
     // Allow operator << to use private variables
     DDSROUTER_CORE_DllAPI friend std::ostream& operator <<(
