@@ -86,11 +86,11 @@ bool BaseParticipant<ConfigurationType>::is_rtps_kind() const noexcept
     // TODO: check if necessary
     // std::lock_guard <std::recursive_mutex> lock(mutex_);
 
-    switch (configuration_.kind()())
+    switch (configuration_.kind())
     {
-        case types::ParticipantKind::SIMPLE_RTPS:
-        case types::ParticipantKind::LOCAL_DISCOVERY_SERVER:
-        case types::ParticipantKind::WAN:
+        case types::ParticipantKind::simple_rtps:
+        case types::ParticipantKind::local_discovery_server:
+        case types::ParticipantKind::wan:
             return true;
         default:
             return false;
