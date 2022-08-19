@@ -138,8 +138,8 @@ Writer::~Writer()
 }
 
 void Writer::onWriterMatched(
-            fastrtps::rtps::RTPSWriter* writer,
-            fastrtps::rtps::MatchingInfo& info)
+        fastrtps::rtps::RTPSWriter* writer,
+        fastrtps::rtps::MatchingInfo& info)
 {
     if (info.status == fastrtps::rtps::MATCHED_MATCHING)
     {
