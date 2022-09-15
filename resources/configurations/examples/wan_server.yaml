@@ -67,6 +67,6 @@ participants:
 # 7: Kind of WANClient: <wan>.
 # InitialPeers discovery to discover and communicate with another WAN DDS Router.
 
-# 8: Add the listening addresses where this DDS Routers will be available
+# 8: Add the listening addresses where this DDS Router will await connections.
 # In this case using localhost (127.0.0.1) port 12666 (UDP by default).
 # Add as many listening-addresses as needed.
