@@ -46,7 +46,7 @@ struct CacheChangePoolConfiguration;
 namespace fastdds {
 namespace rtps {
 
-struct IReaderDataFilter;
+class IReaderDataFilter;
 
 } /* namespace rtps */
 } /* namespace fastdds */
