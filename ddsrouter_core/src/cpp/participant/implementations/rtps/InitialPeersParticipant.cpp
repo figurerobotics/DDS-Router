@@ -176,12 +176,12 @@ fastrtps::rtps::RTPSParticipantAttributes InitialPeersParticipant::participant_a
         }
 
         // Set Logical port for every locator
-        eprosima::fastrtps::rtps::IPLocator::setPhysicalPort(locator, address.port());
+        eprosima::fastrtps::rtps::IPLocator::setPhysicalPort(locator, address.external_port_);
 
         // In TCP case, set Physical port
         if (address.is_tcp())
         {
-            eprosima::fastrtps::rtps::IPLocator::setLogicalPort(locator, address.port());
+            eprosima::fastrtps::rtps::IPLocator::setLogicalPort(locator, address.external_port_);
         }
 
         // Add listening address to builtin

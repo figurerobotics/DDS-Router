@@ -307,29 +307,42 @@ Address YamlReader::get<Address>(
         tp = Address::default_transport_protocol();
     }
 
+    Address add;
     // Construct Address object
     if (domain_name_set)
     {
         if (ip_version_set)
         {
-            return Address(port, ip_version, domain_name, tp);
+            add = Address(port, ip_version, domain_name, tp);
         }
         else
         {
-            return Address(port, domain_name, tp);
+            add = Address(port, domain_name, tp);
         }
     }
     else
     {
         if (ip_version_set)
         {
-            return Address(ip, port, ip_version, tp);
+            add = Address(ip, port, ip_version, tp);
         }
         else
         {
-            return Address(ip, port, tp);
+            add = Address(ip, port, tp);
         }
     }
+
+    // Optional get wan port
+    if (is_tag_present(yml, ADDRESS_EXTERNAL_PORT_TAG))
+    {
+        add.external_port_ = get<PortType>(yml, ADDRESS_EXTERNAL_PORT_TAG, version);
+    }
+    else
+    {
+        add.external_port_ = add.port();
+    }
+
+    return add;
 }
 
 DiscoveryServerConnectionAddress _get_discovery_server_connection_address_v1(

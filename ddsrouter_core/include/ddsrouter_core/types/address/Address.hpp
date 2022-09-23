@@ -208,6 +208,10 @@ public:
     DDSROUTER_CORE_DllAPI static std::pair<IpType, IpVersion> resolve_dns(
             DomainType domain);
 
+    //! TODO: this is a quick workaround. This should be protected and accessed by methods
+    // or refactor the class to be a stuct
+    PortType external_port_;
+
 protected:
 
     //! Internal IP object
