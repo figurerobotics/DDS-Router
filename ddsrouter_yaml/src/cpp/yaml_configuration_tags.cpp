@@ -38,6 +38,7 @@ std::set<std::string> ddsrouter_tags() noexcept
             PARTICIPANT_NAME_TAG,
             COLLECTION_PARTICIPANTS_TAG,
             DOMAIN_ID_TAG,
+            WHITELIST_INTERFACES_TAG,
             DISCOVERY_SERVER_GUID_PREFIX_TAG,
             LISTENING_ADDRESSES_TAG,
             CONNECTION_ADDRESSES_TAG,

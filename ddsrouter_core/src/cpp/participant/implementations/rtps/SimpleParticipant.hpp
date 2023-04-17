@@ -50,6 +50,9 @@ public:
             std::shared_ptr<configuration::SimpleParticipantConfiguration> participant_configuration,
             std::shared_ptr<PayloadPool> payload_pool,
             std::shared_ptr<DiscoveryDatabase> discovery_database);
+
+    static fastrtps::rtps::RTPSParticipantAttributes get_participant_attributes_(
+            const configuration::SimpleParticipantConfiguration* configuration);
 };
 
 } /* namespace rtps */

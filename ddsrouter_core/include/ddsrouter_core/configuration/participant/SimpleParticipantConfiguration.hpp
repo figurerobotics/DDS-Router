@@ -22,6 +22,7 @@
 #include <ddsrouter_core/configuration/participant/ParticipantConfiguration.hpp>
 #include <ddsrouter_core/library/library_dll.h>
 #include <ddsrouter_core/types/dds/DomainId.hpp>
+#include <ddsrouter_core/types/address/Address.hpp>
 
 namespace eprosima {
 namespace ddsrouter {
@@ -67,6 +68,8 @@ public:
     /////////////////////////
 
     types::DomainId domain = types::DomainId(0u);
+
+    std::set<types::IpType> whitelist {};
 };
 
 } /* namespace configuration */
