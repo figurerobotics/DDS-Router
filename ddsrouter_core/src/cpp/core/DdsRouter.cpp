@@ -48,9 +48,10 @@ DdsRouter::DdsRouter(
     utils::Formatter error_msg;
     if (!configuration_.is_valid(error_msg))
     {
-        throw utils::ConfigurationException(
-                  utils::Formatter() <<
-                      "Configuration for DDS Router is invalid: " << error_msg);
+        logInfo(DDSROUTER, "Configuration is invalid, but proceeding: " << error_msg);
+        // throw utils::ConfigurationException(
+        //           utils::Formatter() <<
+        //               "Configuration for DDS Router is invalid: " << error_msg);
     }
 
     // Set default value for history
